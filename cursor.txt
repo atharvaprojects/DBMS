@@ -1,0 +1,44 @@
+CREATE TABLE employee(empno int(5),empname varchar(20),desg 
+varchar(10),empsal int(10));
+Insert Into employee VALUES(1,'shre','delhi',2500);
+Insert Into employee VALUES(2,'raj','lucknow',1000);
+Insert Into employee VALUES(3,'himaj','mirzapur',300);
+Insert Into employee VALUES(4,'roy','calcuta',305);
+Insert Into employee VALUES(5,'yash','gorakpur',500);
+SELECT * FROM employee;
+
+
+
+-- EXPLICIT CURSOR:
+delimiter //
+CREATE PROCEDURE sp()
+begin
+DECLARE x int default 0;
+DECLARE y varchar(20);
+DECLARE z int(20) default 0;
+DECLARE finished int default 0;
+declare c
+cursor for
+Select empno,empname,empsal
+From employee
+order by empsal desc limit 5;
+DECLARE CONTINUE HANDLER 
+FOR NOT FOUND SET finished=1;
+open c;
+ins_loop:loop
+FETCH c INTO x,y,z;
+IF finished =1 THEN LEAVE ins_loop;
+end if;
+select x,y,z;
+END LOOP;
+CLOSE c;
+end;
+//
+delimiter // 
+call sp();
+//
+
+-- IMPLICIT CURSOR:
+Select empno,empname,empsal
+From employee
+order by empsal desc limit 5;

@@ -1,0 +1,123 @@
+use practicals;
+
+
+create table Borrower (
+	Rollin int auto_increment primary key,
+    Name varchar(255),
+    DateOfIssue date,
+    NameofBook varchar(255),
+    Status char(1)
+);
+
+
+
+create table Fine(
+	Roll_no int primary key,
+    Date date,
+    Amt int
+);
+
+create table Library(
+	bid int primary key,
+    bname varchar(255),
+    doi date,
+    status char(1),
+    noc int
+);
+
+
+
+create table Transaction (
+	tid int primary key,
+    bid int,
+    bname varchar(255),
+    status char(1)
+);
+
+-- Sample data for Borrower table
+INSERT INTO Borrower ( Name, DateofIssue, NameofBook, Status) VALUES
+( 'John Doe', '2024-04-01', 'Book1', 'I'),
+( 'Alice Smith', '2024-04-05', 'Book2', 'I'),
+( 'Bob Johnson', '2024-04-10', 'Book3', 'R'),
+( 'Emily Brown', '2024-04-15', 'Book4', 'I'),
+( 'David Wilson', '2024-04-20', 'Book5', 'I');
+
+-- Sample data for Fine table
+INSERT INTO Fine (Roll_no, Date, Amt) VALUES
+(1, '2024-04-15', 50),
+(2, '2024-04-20', 75),
+(3, '2024-04-25', 100),
+(4, '2024-04-30', 150),
+(5, '2024-05-01', 200);
+
+-- Sample data for Library table
+INSERT INTO Library (bid, bname, doi, status, noc) VALUES
+(101, 'Book1', '2024-04-01', 'I', 5),
+(102, 'Book2', '2024-04-05', 'I', 3),
+(103, 'Book3', '2024-04-10', 'R', 4),
+(104, 'Book4', '2024-04-15', 'I', 2),
+(105, 'Book5', '2024-04-20', 'I', 1);
+
+-- Sample data for Transaction table
+INSERT INTO Transaction (tid, bid, bname, status) VALUES
+(1, 101, 'Book1', 'I'),
+(2, 102, 'Book2', 'I'),
+(3, 103, 'Book3', 'R'),
+(4, 104, 'Book4', 'I'),
+(5, 105, 'Book5', 'I');
+
+DELIMITER //
+
+CREATE PROCEDURE HandleBookSubmission(IN p_roll_no INT, IN p_name_of_book VARCHAR(255))
+BEGIN
+    -- Variable declarations
+    DECLARE v_days_late INT;
+    DECLARE v_fine_amt INT;
+    DECLARE v_noc_change INT;
+    DECLARE existing_fine_count INT;
+    DECLARE v_doi DATE;
+
+    -- Get the date of issue for the specified book
+    SELECT DateOfIssue INTO v_doi FROM Borrower WHERE Rollin = p_roll_no AND NameofBook = p_name_of_book;
+
+    -- Calculate the number of days late
+    SET v_days_late = DATEDIFF(NOW(), v_doi) - 15;
+
+    -- Calculate fine amount based on the number of days late
+    IF v_days_late > 30 THEN
+        SET v_fine_amt = 50 * (v_days_late - 30);
+    ELSE 
+        SET v_fine_amt = 5 * v_days_late;
+    END IF;
+
+    -- Update the status of the book submission
+    UPDATE Borrower SET Status = 'R' WHERE Rollin = p_roll_no AND NameofBook = p_name_of_book;
+
+    -- Check if fine amount is greater than 0
+    IF v_fine_amt > 0 THEN
+        -- Check if a fine record already exists for this borrower
+        SELECT COUNT(*) INTO existing_fine_count FROM Fine WHERE Roll_no = p_roll_no;
+
+        IF existing_fine_count > 0 THEN
+            -- Update existing fine record
+            UPDATE Fine SET Date = NOW(), Amt = Amt + v_fine_amt WHERE Roll_no = p_roll_no;
+        ELSE
+            -- Insert new fine record
+            INSERT INTO Fine (Roll_no, Date, Amt) VALUES (p_roll_no, NOW(), v_fine_amt);
+        END IF;
+    END IF;
+
+    -- Display message indicating book submission was handled successfully
+    SELECT CONCAT('Book submission handled successfully. Fine amount: Rs:', v_fine_amt) AS Message;
+END;
+//
+
+DELIMITER ;
+
+
+
+
+call HandleBookSubmission(2, 'Book2');
+
+
+set sql_safe_updates = 0;

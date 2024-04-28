@@ -1,0 +1,84 @@
+use practicals;
+
+create table Project (
+	ProjectID int primary key,
+    Name varchar(255),
+    Deadline Date
+);
+
+create table Department (
+	DepartmentID int primary key,
+    Name varchar(255)
+);
+
+
+create table Employee(
+	EmployeeID int auto_increment primary key,
+    Name varchar(255),
+    DepartmentID int,
+    Position varchar(255),
+    constraint fk_department
+		foreign key (DepartmentID)
+        references Department(DepartmentID)
+);
+
+
+
+
+
+
+create table Employee_Project (
+	ProjectID int,
+    EmployeeID int,
+    primary key (ProjectID, EmployeeID),
+    constraint fk_project
+		foreign key (ProjectID)
+        references Project(ProjectID),
+	constraint fk_employee
+		foreign key (EmployeeID)
+        references Employee(EmployeeID)
+);
+
+
+
+insert into Department (DepartmentID, Name) values
+(1, 'Management'),
+(2, 'Engineering'),
+(3, 'Marketing');
+
+insert into Project (ProjectID, Name, Deadline) values
+(101, 'Website Redesign', '2024-6-30'),
+(102, 'Mobile App Development', '2024-07-15'),
+(103, 'Product Launch', '2024-08-31');
+
+insert into Employee(EmployeeID, Name, DepartmentID, Position) values
+(1, 'John Smith', 1,  'Manager'),
+(2, 'William Jackson', 2, 'Software Engineer'),
+(3, 'Jack Sparrow', 1, 'Sales Associate'),
+(4, 'Emil chowsky', 2, 'Software Engineer'),
+(5, 'Chris Wilson', 3, 'Marketing Manager');
+
+insert into Employee_Project (ProjectID, EmployeeID) values
+(101, 2),
+(102, 3),
+(101, 5),
+(102, 1),
+(102, 2),
+(103, 3),
+(103, 5);
+
+select * from Employee;
+
+create view Managers as
+select * from Employee where Position = 'Manager';
+
+select * from Managers;  -- seeing the 'view' managers
+
+create view OngoingProjects AS
+select * from Project where Deadline > curdate();
+
+select * from OngoingProjects;
+
+create index idx_employee_id on Employee(DepartmentID, EmployeeID);
+
+

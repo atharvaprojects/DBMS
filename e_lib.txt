@@ -1,0 +1,86 @@
+use practicals;
+
+create table Borrower(
+	Rollin int primary key,
+    Name varchar(255),
+    DateofIssue date,
+    NameofBook varchar(255),
+    Status char(1)
+);
+INSERT INTO Borrower (Rollin, Name, DateofIssue, NameofBook, Status) VALUES
+(1, 'John Doe', '2024-04-01', 'Book1', 'I'),
+(2, 'Alice Smith', '2024-04-05', 'Book2', 'I'),
+(3, 'Bob Johnson', '2024-04-10', 'Book3', 'R'),
+(4, 'Emily Brown', '2024-04-15', 'Book4', 'I'),
+(5, 'David Wilson', '2024-04-20', 'Book5', 'R');
+
+create table Orders (
+	OrderID int primary key,
+    CustomerID int,
+    OrderDate date,
+    TotalAmount Decimal(10, 2),
+    foreign key (CustomerID) references Customer(CustomerID)
+);
+
+insert into Orders (OrderID, CustomerID, OrderDate, TotalAmount) values
+(1, 1, '2024-04-01', 100.00),
+(2, 3, '2024-04-05', 150.00),
+(3, 3, '2024-04-10', 200.00),
+(4, 4, '2024-04-15', 120.00),
+(5, 4, '2024-04-20', 180.00);
+
+
+
+create table Customer(
+	CustomerID int primary key,
+    CustomerName varchar(255),
+    ContactNumber varchar(15)
+);
+INSERT INTO Customer (CustomerID, CustomerName, ContactNumber) VALUES
+(1, 'John Doe', '123-456-7890'),
+(2, 'Alice Smith', '987-654-3210'),
+(3, 'Bob Johnson', '456-789-0123'),
+(4, 'Emily Brown', '789-012-3456'),
+(5, 'David Wilson', '012-345-6789');
+
+create table Products (
+	ProductID int primary key,
+    ProductName varchar(255),
+    UnitPrice decimal(10, 2)
+);
+
+insert into Products (ProductID, ProductName, UnitPrice) values
+(1, 'Product1', 10.00),
+(2, 'Product2', 20.00),
+(3, 'Product3', 30.00),
+(4, 'Product4', 40.00),
+(5, 'Product5', 50.00);
+
+select Orders.OrderID, Customer.CustomerName
+from Orders
+inner join Customer on Orders.CustomerID = Customer.CustomerID;
+
+select Customer.CustomerName, Orders.OrderID
+from Customer
+left join Orders on Customer.CustomerID = Orders.CustomerID;
+
+select Customer.CustomerName, Orders.orderID
+from Customer
+right join Orders on Customer.CustomerID = Orders.CustomerID;
+
+select CustomerName
+from Customer
+where CustomerID in (select CustomerID from Orders);
+
+Select CustomerName from Customer where exists (Select * from Orders where Orders.CustomerID = Customer.CustomerID);
+
+create view HighOrder as
+select OrderID, OrderDate, CustomerID, TotalAmount
+from Orders
+where TotalAmount > 120;
+
+select * from HighOrder;
+
+select Customer.CustomerName, Products.ProductName
+from Customer
+cross join Products;

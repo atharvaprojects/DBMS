@@ -1,0 +1,64 @@
+use practicals;
+
+create table Category (
+	city_name varchar(100),
+    city_type varchar(50)
+);
+
+DELIMITER //
+
+CREATE PROCEDURE calculate_popu_den(IN city_name VARCHAR(100), IN population INT)
+BEGIN
+    DECLARE density INT;
+    DECLARE city_type VARCHAR(50);
+
+    IF population < 10 OR population > 25718 THEN
+        SELECT 'Error: Population must be between 10 and 25718';
+        end if;
+    
+
+    SET density = population / 100;
+
+    IF density > 3000 THEN
+        SET city_type = 'High Density';
+    ELSEIF density >= 1000 THEN
+        SET city_type = 'Moderate Density';
+    ELSE
+        SET city_type = 'Low Density';
+    END IF;
+
+    INSERT INTO Category (city_name, city_type) VALUES (city_name, city_type);
+
+    SELECT CONCAT('Population density of ', city_name, ' is ', density, ' people per square kilometer. Type of city: ', city_type);
+END;
+//
+
+DELIMITER ;
+
+DELIMITER //
+create function get_popu_den(city_name varchar(100), population int) returns varchar(255) DETERMINISTIC
+begin
+	declare density int;
+    declare city_type varchar(50);
+    
+    IF population < 10 OR population > 25718 THEN
+        RETURN 'Error: Population must be between 10 and 25718.';
+    END IF;
+    SET density = population / 100;
+
+    IF density > 3000 THEN
+        SET city_type := 'High Density';
+    ELSEIF density >= 1000 THEN
+        SET city_type = 'Moderate Density';
+    ELSE
+        SET city_type = 'Low Density';
+    END IF;
+
+    return CONCAT('Population density of ', city_name, ' is ', density, ' people per square kilometer. Type of city: ', city_type);
+END;
+//
+
+DELIMITER ;
+
+call calculate_popu_den('Pune', 10000); -- procedure
+select get_popu_den('Pune', 20000);

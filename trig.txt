@@ -1,0 +1,93 @@
+use practicals;
+
+create table Library (
+	bid int primary key,
+    bname varchar(255),
+    doi Date,
+    status varchar(50),
+    fine int default 0
+);
+
+create table Library_audit (
+	bid int,
+    bname varchar(255),
+    noc int,
+    timestampofquery timestamp default current_timestamp,
+    fine int
+);
+
+DELIMITER //
+create trigger update_noc_on_library_change
+after insert on Library
+for each ROW
+begin
+    if NEW.status = 'ISSUE' then
+        update Library_audit
+        set noc = IFNULL(noc, 0) - 1
+        where bid = NEW.bid and bname = NEW.bname;
+    elseif NEW.status = 'RETURN' then
+        update Library_audit
+        set noc = IFNULL(noc, 0) + 2
+        where bid = NEW.bid and bname = NEW.bname;
+    end if;
+end;
+//
+
+create trigger check_fine_on_library_update
+before update on Library
+for each ROW
+begin
+	if NEW.doi < Date_SUB(NOW(), interval 20 DAY) then
+		set NEW.status = 'FINE';
+		set NEW.fine = DATEDIFF(NOW(), NEW.doi) * 10;
+    
+		insert into Library_audit (bid, bname, noc, fine)
+		values (NEW.bid, NEW.bname, null, NEW.fine);
+    end if;
+end;
+//
+DELIMITER ;
+
+SET SQL_SAFE_UPDATES = 0;
+insert into Library (bid, bname, doi, status) values
+(1, 'Book1', '2024-04-01', 'ISSUE'),
+(2, 'Book2', '2024-04-10', 'ISSUE'),
+(3, 'Book3', '2024-04-15', 'RETURN'),
+(4, 'Book4', '2024-04-20', 'RETURN');
+
+select * from Library;
+
+-- Practical 4 BELOW -----------------------------------------------------------------------------------------------------
+
+DELIMITER //
+create trigger library_audit_trigger
+after update on Library
+for each row
+begin
+	insert into Library_audit (bid, bname, doi, status, action, timestampofquery)
+    values (OLD.bid, OLD.bname, OLD.doi, OLD.status, 'UPDATE', NOW());
+end;
+//
+
+create trigger track_library_deletions
+after delete on Library
+for each row
+begin
+	insert into Library_Audit (bid, bname, doi, status, action, timestampofquery)
+    values (OLD.bid, OLD.bname, OLD.doi, OLD.status, 'DELETE', NOW());
+end;
+//
+Delimiter ;
+
+-- DROP TRIGGER IF EXISTS update_noc_on_library_change;
+-- DROP TRIGGER IF EXISTS check_fine_on_library_update;
+-- DROP TRIGGER IF EXISTS library_audit_trigger;
+-- DROP TRIGGER IF EXISTS track_library_deletions;
+
+
+update Library set status = 'RETURN' where bid=1;
+delete from Library where bid = 2;
+
+select * from Library;
+select * from Library_audit;
+

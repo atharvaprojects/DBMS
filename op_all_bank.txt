@@ -1,0 +1,170 @@
+use practicals;
+
+create table Branch (
+    branch_name varchar(255) primary key,
+    branch_city varchar(255),
+    assets decimal(12, 2)
+);
+
+insert into Branch (branch_name, branch_city, assets) values
+('Branch1', 'City1', 100000.00),
+('Branch2', 'City2', 120000.00),
+('Branch3', 'City3', 90000.00);
+
+create table Account (
+    Acc_no int primary key,
+    branch_name varchar(255),
+    balance decimal(10, 2),
+    foreign key (branch_name) references Branch(branch_name)
+);
+
+
+
+insert into Account (Acc_no, branch_name, balance) values
+(1, 'Branch1', 10000.00),
+(2, 'Branch2', 15000.00),
+(3, 'Branch3', 20000.00),
+(4, 'Branch4', 11000.00),
+(5, 'Branch5', 14000.00);
+
+select * from Account;
+SELECT DISTINCT branch_name FROM Account;
+SELECT DISTINCT branch_name FROM Branch;
+SHOW CREATE TABLE Branch;
+
+
+
+
+drop table Account;
+drop table Depositor;
+drop table Customer;
+drop table Borrower;
+drop table Branch;
+drop table Loan;
+
+create table Customer (
+	cust_name varchar(255) primary key,
+    cust_street varchar(255),
+    cust_city varchar(255)
+);
+
+
+create table Loan (
+	loan_no int primary key,
+    branch_name varchar(255),
+    amount decimal(10,2),
+    foreign key (branch_name) references Branch(branch_name)
+);
+
+
+create table Borrower (
+	cust_name varchar(255),
+    loan_no int,
+    primary key (cust_name, loan_no),
+    foreign key (cust_name) references Customer(cust_name)
+);
+
+create table Depositor (
+	cust_name varchar(255),
+    Acc_no int,
+    primary key (cust_name, Acc_no),
+    foreign key (cust_name) references Customer(cust_name),
+    foreign key (Acc_no) references Account(Acc_no)
+);
+
+
+
+insert into Customer (cust_name, cust_street, cust_city) values
+('Customer1', 'Street1', 'City1'),
+('Customer2', 'Street2', 'City2'),
+('Customer3', 'Street3', 'City3'),
+('Customer4', 'Street4', 'City4'),
+('Customer5', 'Street5', 'City5');
+
+select * from Customer;
+
+INSERT INTO Depositor (cust_name, Acc_no) VALUES
+('Customer1', 1),
+('Customer2', 2),
+('Customer3', 3),
+('Customer4', 4),
+('Customer5', 5);
+
+select * from Depositor;
+
+INSERT INTO Loan (loan_no, branch_name, amount) VALUES
+(101, 'Branch1', 5000.00),
+(102, 'Branch2', 7000.00),
+(103, 'Branch1', 6000.00),
+(104, 'Branch3', 8000.00),
+(105, 'Branch2', 9000.00);
+
+select * from Loan;
+
+
+INSERT INTO Borrower (cust_name, loan_no) VALUES
+('Customer1', 101),
+('Customer2', 102),
+('Customer3', 103),
+('Customer4', 104),
+('Customer5', 105);
+
+select * from Borrower;
+
+
+
+
+select branch_name, avg(balance) as avg_balance
+from Account
+group by branch_name;
+
+select branch_name, count(*) as num from Depositor inner join Branch group by branch_name;
+
+select branch_name from Account group by branch_name having avg(balance)  > 12000;
+
+select count(*) as num_tuples from Customer;
+
+-- Practical 15 below--------------------------------------------------------------------------------------------------------------------------------------
+
+
+select distinct branch_name from loan;
+
+select loan_no from Loan where branch_name = 'Branch1' and amount > 2000;
+
+select c.cust_name, l.loan_no, l.amount
+from Customer c
+join Borrower b on c.cust_name = b.cust_name
+join Loan l on b.loan_no = l.loan_no;
+
+
+-- Practical 16 below--------------------------------------------------------------------------------------------------------------------------------------
+
+select distinct cust_name from 
+(
+	select cust_name from Depositor
+    union
+    select cust_name from Borrower
+	
+) as CustomersWithAccOrLoans;
+
+select * from Account;
+
+select distinct d.cust_name
+from Depositor d
+inner join Borrower b on d.cust_name = b.cust_name;
+
+-- Practical 17 below--------------------------------------------------------------------------------------------------------------------------------------
+
+select sum(amount) as total_amt from Loan;
+
+delete from Loan where amount between 6000 and 7000;
+
+select * from Loan;
+
+delete from Loan where branch_name in (select branch_name from Branch where branch_city = 'City1');
+
+delete from Branch where branch_city = 'City1';
+
+select * from Branch;
+
+set sql_safe_updates = 0;

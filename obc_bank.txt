@@ -1,0 +1,56 @@
+create table Deposit (
+	actno int primary key,
+    cname varchar(255),
+    bname varchar(255),
+    amount decimal(10, 2),
+    adate date,
+    foreign key (cname) references Customers(cname),
+    foreign key (bname) references Branch(bname)
+);
+
+INSERT INTO Deposit (actno, cname, bname, amount, adate) VALUES
+(1, 'ABC', 'OBC', 5000.00, '2024-04-20'),
+(2, 'XYZ', 'SBI', 7000.00, '2024-04-21'),
+(3, 'PQR', 'ICICI', 6000.00, '2024-04-22'),
+(4, 'ABC', 'OBC', 3000.00, '2024-04-23');
+
+
+create table Branch (
+	bname varchar(255) primary key,
+    city varchar(255)
+);
+
+INSERT INTO Branch (bname, city) VALUES
+('OBC', 'Pune'),
+('SBI', 'Mumbai'),
+('ICICI', 'Delhi');
+
+create table Customers (
+	cname varchar(255) primary key,
+    city varchar(255)
+);
+
+insert into Customers (cname, city) values
+('ABC', 'Pune'),
+('XYZ', 'Mumbai'),
+('PQR', 'Pune'),
+('LMN', 'Pune');
+
+create table Borrow (
+	loanno int primary key,
+    cname varchar(255),
+    bname varchar(255),
+    amount decimal(10, 2),
+    foreign key (cname) references Customers(cname),
+    foreign key (bname) references Branch(bname)
+);
+
+select adate from Deposit where cname = 'ABC';
+
+alter table Deposit modify amount decimal (10, 2);
+
+select cname from Customers where city='Pune';
+
+select city from Branch where bname = 'OBC';
+
+select count(*) AS num_tuples from Customers;
