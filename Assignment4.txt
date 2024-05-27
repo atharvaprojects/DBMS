@@ -1,0 +1,208 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+ANS :
+The table in the image is already in 1NF (First Normal Form).
+A table is considered to be in 1NF if it adheres to the following rules:
+●	Each cell contains only one single value. There are no repeating groups of values within a single cell.
+●	Every column has a unique name.
+●	There are no rows containing duplicate data.
+The table Table_Product complies with these conditions:
+●	Each cell contains just one value (product ID, color, or price).
+●	Every column has a distinct name (Product Id, Colour, and Price).
+●	There are no duplicate rows (each product has a unique ID).
+Therefore, the table is already in its most basic and normalized form following the principles of 1NF.
+SQL:
+
+CREATE TABLE Table_Product (
+  Product_Id INT PRIMARY KEY,
+  Colour VARCHAR(255),
+  Price DECIMAL(10,2)
+);
+
+
+
+
+ 
+ANS :
+To achieve 2NF, we can decompose the table into two separate tables:
+1.	Customers: (Customer_id, Location)
+2.	Purchases: (Customer_id, Store_id)
+Explanation:
+●	The Customers table stores information about customers, including their unique identifier and their location.
+●	The Purchases table stores details about customer purchases, including the customer's ID and the store ID where the purchase was made.
+By separating the information, we eliminate the partial dependency and ensure that each attribute in a table relies on the entire primary key of that table.
+Here's the SQL code to create the normalized tables:
+1. Customers Table:
+SQL
+CREATE TABLE Customers (
+  Customer_id INT PRIMARY KEY,
+  Location VARCHAR(255) NOT NULL
+);
+
+
+2. Purchases Table:
+SQL
+CREATE TABLE Purchases (
+  Customer_id INT,
+  Store_id INT,
+  FOREIGN KEY (Customer_id) REFERENCES Customers(Customer_id),
+  PRIMARY KEY (Customer_id, Store_id)  -- Composite primary key
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+ANS :
+In order to achieve 3NF, we can decompose the table into two separate tables:
+1.	Book: (Book_id, Price)
+2.	Book_Genre (Book_id, Genre)
+Here's the explanation for the decomposition:
+●	The original table has a partial dependency between Book_id and Genre. This means that a book can have multiple genres, and the genre is determined by the book itself, but not necessarily by the unique book identifier.
+●	By creating a separate Book_Genre table, we can establish a many-to-many relationship between books and genres. A book can belong to multiple genres, and a genre can be associated with multiple books.
+●	The Book table now only contains attributes that directly relate to a specific book, including its unique identifier and price.
+●	The Book_Genre table links books and genres using the foreign key relationship between Book_id in both tables.
+This decomposition eliminates the redundancy in the original table and ensures that each attribute in a table is functionally dependent on the primary key. This is a key principle of 3NF and helps to maintain data integrity within the database.
+
+
+
+Here's the SQL code for the decomposed tables in 3NF:
+1. Book Table:
+SQL
+CREATE TABLE Book (
+  Book_id INT PRIMARY KEY,
+  Price DECIMAL(10,2) NOT NULL
+);
+This table stores information about books, including:
+●	Book_id: Unique identifier for the book (primary key).
+●	Price: Price of the book.
+2. Book_Genre Table:
+SQL
+CREATE TABLE Book_Genre (
+  Book_id INT,
+  Genre VARCHAR(255) NOT NULL,
+  FOREIGN KEY (Book_id) REFERENCES Book(Book_id),
+  PRIMARY KEY (Book_id, Genre)  -- Composite primary key
+);
+This table stores the many-to-many relationship between books and genres:
+●	Book_id: Foreign key referencing the book in the Book table (primary key).
+●	Genre: Text data specifying the genre of the book.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+ANS :
+The table in the image depicts a scenario where a student enrolls in multiple courses offered by different teachers. To achieve Boyce-Codd Normal Form (BCNF), we can decompose the relation into two tables:
+1.	Enrollment(Student_id, Course_id, PRIMARY KEY(Student_id, Course_id))
+2.	Teacher(Teacher_id, Teacher_name, Course_id, PRIMARY KEY(Teacher_id))
+Here's a breakdown of the reasoning behind this decomposition:
+●	The original table has a composite primary key consisting of Student_id and Course_id.
+●	There exists a functional dependency between Course_id and Teacher_id. This means that a specific course has a single teacher assigned to it, and the teacher's identity is determined by the course they teach.
+The current table structure violates BCNF because the determinant (Course_id) of the functional dependency is not a superkey for the table. In other words, Course_id alone cannot uniquely identify a row in the table.
+By decomposing the table into two separate tables, we can ensure that each table adheres to the principle of BCNF:
+●	The Enrollment table stores enrollment information, with the composite primary key uniquely identifying each student's enrollment in a specific course.
+●	The Teacher table stores teacher details, where the primary key (Teacher_id) uniquely identifies a teacher, and Course_id is a foreign key referencing the Course_id in the Enrollment table. This establishes a relationship between teachers and the courses they teach.
+In conclusion, this decomposition eliminates redundancy and guarantees that every functional dependency in the tables adheres to the BCNF requirements.
+SQL :
+1. Enrollment Table:
+SQL
+
+CREATE TABLE Enrollment (
+  Student_id INT,
+  Course_id INT,
+  PRIMARY KEY (Student_id, Course_id),
+  FOREIGN KEY (Student_id) REFERENCES Student(Student_id),  -- Assuming a separate Student table exists
+  FOREIGN KEY (Course_id) REFERENCES Course(Course_id)   -- Assuming a separate Course table exists
+);
+2. Teacher Table:
+SQL
+
+CREATE TABLE Teacher (
+  Teacher_id INT PRIMARY KEY,
+  Teacher_name VARCHAR(255) NOT NULL,
+  Course_id INT,
+  FOREIGN KEY (Course_id) REFERENCES Course(Course_id)
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+ANS:
+Explanation of the Issue:
+●	The multi-valued dependency exists between Student and Hobby. A single student can have multiple hobbies, and these hobbies are not dependent on the student's major.
+Normalization Approach:
+To achieve 4NF, we can decompose the table into two separate tables:
+1.	Student(Student, Major, PRIMARY KEY(Student))
+2.	Student_Hobby(Student, Hobby, PRIMARY KEY(Student, Hobby))
+Reasoning:
+●	The Student table stores information about students, including their unique identifier and their major.
+●	The Student_Hobby table establishes a many-to-many relationship between students and their hobbies. The composite primary key of Student and Hobby uniquely identifies a specific student's hobby.
+Addressing the Composite Primary Key:
+Since 4NF builds upon 3NF, it's important to ensure the tables are already in 3NF. In this case, the original table violated 3NF due to the partial dependency of Hobby on Student.
+By decomposing the table, we eliminate the multi-valued dependency and achieve both 3NF and 4NF.
+SQL Code:
+SQL
+CREATE TABLE Student (
+  Student VARCHAR(255) PRIMARY KEY,
+  Major VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE Student_Hobby (
+  Student VARCHAR(255),
+  Hobby VARCHAR(255),
+  PRIMARY KEY (Student, Hobby),
+  FOREIGN KEY (Student) REFERENCES Student(Student)
+);
+

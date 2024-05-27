@@ -1,0 +1,589 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+ANS :
+-- Create tables with appropriate constraints
+
+CREATE TABLE Account (
+    Acc_no INT PRIMARY KEY,
+    branch_name VARCHAR(255),
+    balance DECIMAL(10, 2),
+    FOREIGN KEY (branch_name) REFERENCES branch(branch_name)
+);
+
+CREATE TABLE branch (
+    branch_name VARCHAR(255) PRIMARY KEY,
+    branch_city VARCHAR(255),
+    assets DECIMAL(15, 2)
+);
+
+CREATE TABLE customer (
+    cust_name VARCHAR(255) PRIMARY KEY,
+    cust_street VARCHAR(255),
+    cust_city VARCHAR(255)
+);
+
+CREATE TABLE Depositor (
+    cust_name VARCHAR(255),
+    acc_no INT,
+    PRIMARY KEY (cust_name, acc_no),
+    FOREIGN KEY (cust_name) REFERENCES customer(cust_name),
+    FOREIGN KEY (acc_no) REFERENCES Account(Acc_no)
+);
+
+CREATE TABLE Loan (
+    loan_no INT PRIMARY KEY,
+    branch_name VARCHAR(255),
+    amount DECIMAL(10, 2),
+    FOREIGN KEY (branch_name) REFERENCES branch(branch_name)
+);
+
+CREATE TABLE Borrower (
+    cust_name VARCHAR(255),
+    loan_no INT,
+    PRIMARY KEY (cust_name, loan_no),
+    FOREIGN KEY (cust_name) REFERENCES customer(cust_name),
+    FOREIGN KEY (loan_no) REFERENCES Loan(loan_no)
+);
+
+-- Queries
+
+-- 1. Find the names of all branches in the loan relation.
+SELECT DISTINCT branch_name FROM Loan;
+
+-- 2. Find all loan numbers for loans made at Shivaji nagar Branch with loan amount > 12000.
+SELECT loan_no FROM Loan WHERE branch_name = 'Shivaji nagar' AND amount > 12000;
+
+-- 3. Find all customers who have a loan from bank. Find their names, loan_no, and loan amount.
+SELECT c.cust_name, l.loan_no, l.amount
+FROM customer c
+JOIN Borrower b ON c.cust_name = b.cust_name
+JOIN Loan l ON b.loan_no = l.loan_no;
+
+-- 4. List all customers in alphabetical order who have loan from Shivaji nagar branch.
+SELECT c.cust_name
+FROM customer c
+JOIN Borrower b ON c.cust_name = b.cust_name
+JOIN Loan l ON b.loan_no = l.loan_no
+WHERE l.branch_name = 'Shivaji nagar'
+ORDER BY c.cust_name;
+
+-- 5. Find all customers who have an account or loan or both at bank.
+SELECT DISTINCT c.cust_name
+FROM customer c
+LEFT JOIN Depositor d ON c.cust_name = d.cust_name
+LEFT JOIN Borrower b ON c.cust_name = b.cust_name
+WHERE d.cust_name IS NOT NULL OR b.cust_name IS NOT NULL;
+
+-- 6. Find all customers who have both account and loan at bank.
+SELECT DISTINCT c.cust_name
+FROM customer c
+JOIN Depositor d ON c.cust_name = d.cust_name
+JOIN Borrower b ON c.cust_name = b.cust_name;
+
+-- 7. Find all customers who have an account but no loan at the bank.
+SELECT DISTINCT c.cust_name
+FROM customer c
+JOIN Depositor d ON c.cust_name = d.cust_name
+LEFT JOIN Borrower b ON c.cust_name = b.cust_name
+WHERE b.cust_name IS NULL;
+
+-- 8. Find average account balance at Shivaji nagar branch.
+SELECT AVG(balance) AS average_balance
+FROM Account
+WHERE branch_name = 'Shivaji nagar';
+
+-- 9. Find the average account balance at each branch.
+SELECT branch_name, AVG(balance) AS average_balance
+FROM Account
+GROUP BY branch_name;
+
+-- 10. Find the number of depositors at each branch.
+SELECT a.branch_name, COUNT(DISTINCT d.cust_name) AS num_depositors
+FROM Account a
+LEFT JOIN Depositor d ON a.Acc_no = d.acc_no
+GROUP BY a.branch_name;
+
+-- 11. Find the branches where average account balance > 12000.
+SELECT branch_name
+FROM Account
+GROUP BY branch_name
+HAVING AVG(balance) > 12000;
+
+-- 12. Find the number of tuples in the customer relation.
+SELECT COUNT(*) AS num_tuples FROM customer;
+
+-- 13. Calculate total loan amount given by the bank.
+SELECT SUM(amount) AS total_loan_amount FROM Loan;
+
+-- 14. Delete all loans with a loan amount between 1300 and 1500.
+DELETE FROM Loan
+WHERE amount BETWEEN 1300 AND 1500;
+
+-- 15. Delete all tuples at every branch located in Sharanpur road.
+DELETE FROM branch
+WHERE branch_city = 'Sharanpur road';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+ANS:
+1.
+CREATE SEQUENCE empno_seq
+START WITH 1
+INCREMENT BY 1
+NO CACHE;
+
+2.
+CREATE INDEX county_idx
+ON employee(county);
+
+3. 
+EXPLAIN SELECT zipcode
+FROM employee
+WHERE county = '071';
+
+4.
+CREATE VIEW low_salary_mumbai_employees AS
+SELECT empno, empname, designation, city, salary, zipcode, county
+FROM employee
+WHERE salary < 50000 AND city = 'Mumbai';
+
+
+
+
+
+ 
+
+ANS :
+
+1.
+SELECT s.studentid, s.studentname, s.instructorid, s.studentcity, i.Instructorname
+FROM Student s
+INNER JOIN Instructor i ON s.instructorid = i.instructorid;
+
+2.
+SELECT s.studentid, s.studentname, s.instructorid, s.studentcity
+FROM Student s
+LEFT JOIN Instructor i ON s.instructorid = i.instructorid
+WHERE i.instructorid IS NULL;
+
+3.
+SELECT COALESCE(s.studentid, i.instructorid) AS id, s.studentname, i.Instructorname
+FROM Student s
+FULL OUTER JOIN Instructor i ON s.instructorid = i.instructorid
+WHERE s.instructorid IS NULL OR i.instructorid IS NULL;
+
+4.
+SELECT s.studentid, s.studentname, s.instructorid, s.studentcity
+FROM Student s
+INNER JOIN Instructor i ON s.instructorid = i.instructorid
+WHERE i.specialization = 'computer';
+
+5.
+CREATE VIEW StudentsInPune AS
+SELECT COUNT(s.studentid) AS num_students
+FROM Student s
+INNER JOIN Instructor i ON s.instructorid = i.instructorid
+WHERE i.instructorcity = 'Pune';
+ 
+
+ANS :
+
+1.
+DECLARE
+    v_rollin Borrower.Rollin%TYPE;
+    v_name Borrower.Name%TYPE;
+    v_dateofissue Borrower.DateofIssue%TYPE;
+    v_nameofbook Borrower.NameofBook%TYPE;
+    v_status Borrower.Status%TYPE;
+BEGIN
+    -- Accepting input for Borrower table
+    v_rollin := &v_rollin;
+    v_name := '&v_name';
+    v_dateofissue := TO_DATE('&v_dateofissue', 'DD-MM-YYYY');
+    v_nameofbook := '&v_nameofbook';
+    v_status := 'I'; -- Assuming the initial status is 'I' for issued
+
+    -- Inserting values into Borrower table
+    INSERT INTO Borrower (Rollin, Name, DateofIssue, NameofBook, Status)
+    VALUES (v_rollin, v_name, v_dateofissue, v_nameofbook, v_status);
+
+    DBMS_OUTPUT.PUT_LINE('Record inserted successfully.');
+END;
+
+
+
+2.
+DECLARE
+    v_rollin Borrower.Rollin%TYPE;
+    v_dateofissue Borrower.DateofIssue%TYPE;
+    v_days_late NUMBER;
+    v_fine_amt NUMBER;
+BEGIN
+    -- Fetching rollin and dateofissue for processing
+    SELECT Rollin, DateofIssue
+    INTO v_rollin, v_dateofissue
+    FROM Borrower
+    WHERE Status = 'I'; -- Assuming 'I' represents the book is issued
+
+    -- Calculating number of days late
+    v_days_late := TRUNC(SYSDATE - v_dateofissue);
+
+    IF v_days_late BETWEEN 15 AND 30 THEN
+        v_fine_amt := 5 * v_days_late;
+    ELSE
+        v_fine_amt := 50 * v_days_late;
+    END IF;
+
+    -- Updating status to 'R' (returned) in Borrower table
+    UPDATE Borrower
+    SET Status = 'R'
+    WHERE Rollin = v_rollin;
+
+    -- Inserting fine details into Fine table
+    INSERT INTO Fine (Roll_no, Date, Amt)
+    VALUES (v_rollin, SYSDATE, v_fine_amt);
+
+    DBMS_OUTPUT.PUT_LINE('Fine calculated and updated successfully.');
+END;
+/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+ANS:
+
+-- Create tables
+CREATE TABLE O_Roll (
+    Rollno NUMBER PRIMARY KEY,
+    Name VARCHAR2(50),
+    DOB DATE,
+    Phone VARCHAR2(20),
+    Address VARCHAR2(100)
+);
+
+CREATE TABLE N_Roll (
+    Rollno NUMBER PRIMARY KEY,
+    Name VARCHAR2(50),
+    DOB DATE,
+    Phone VARCHAR2(20),
+    Address VARCHAR2(100)
+);
+
+-- Insert sample data
+INSERT INTO O_Roll (Rollno, Name, DOB, Phone, Address)
+VALUES (1, 'Alice', TO_DATE('2000-01-01', 'YYYY-MM-DD'), '1234567890', '123 Main St');
+
+INSERT INTO O_Roll (Rollno, Name, DOB, Phone, Address)
+VALUES (2, 'Bob', TO_DATE('2001-02-02', 'YYYY-MM-DD'), '2345678901', '456 Elm St');
+
+INSERT INTO N_Roll (Rollno, Name, DOB, Phone, Address)
+VALUES (2, 'Bob', TO_DATE('2001-02-02', 'YYYY-MM-DD'), '2345678901', '456 Elm St');
+
+INSERT INTO N_Roll (Rollno, Name, DOB, Phone, Address)
+VALUES (3, 'Charlie', TO_DATE('2002-03-03', 'YYYY-MM-DD'), '3456789012', '789 Oak St');
+
+-- PL/SQL block to merge records and eliminate duplicates
+DECLARE
+    CURSOR implicit_cur IS
+        SELECT * FROM O_Roll
+        UNION
+        SELECT * FROM N_Roll;
+
+    CURSOR explicit_cur IS
+        SELECT Rollno, Name, DOB, Phone, Address FROM O_Roll
+        UNION
+        SELECT Rollno, Name, DOB, Phone, Address FROM N_Roll;
+
+    CURSOR for_cur IS
+        SELECT * FROM O_Roll;
+
+    CURSOR param_cur (rollno_param NUMBER) IS
+        SELECT * FROM N_Roll WHERE Rollno = rollno_param;
+
+    v_rollno O_Roll.Rollno%TYPE;
+    v_name O_Roll.Name%TYPE;
+    v_dob O_Roll.DOB%TYPE;
+    v_phone O_Roll.Phone%TYPE;
+    v_address O_Roll.Address%TYPE;
+BEGIN
+    -- Implicit cursor
+    DBMS_OUTPUT.PUT_LINE('Implicit Cursor:');
+    FOR rec IN implicit_cur LOOP
+        DBMS_OUTPUT.PUT_LINE(rec.Rollno || ' ' || rec.Name || ' ' || rec.DOB || ' ' || rec.Phone || ' ' || rec.Address);
+    END LOOP;
+
+    -- Explicit cursor
+    DBMS_OUTPUT.PUT_LINE('Explicit Cursor:');
+    OPEN explicit_cur;
+    LOOP
+        FETCH explicit_cur INTO v_rollno, v_name, v_dob, v_phone, v_address;
+        EXIT WHEN explicit_cur%NOTFOUND;
+        DBMS_OUTPUT.PUT_LINE(v_rollno || ' ' || v_name || ' ' || v_dob || ' ' || v_phone || ' ' || v_address);
+    END LOOP;
+    CLOSE explicit_cur;
+
+    -- For loop cursor
+    DBMS_OUTPUT.PUT_LINE('For Loop Cursor:');
+    FOR rec IN for_cur LOOP
+        DBMS_OUTPUT.PUT_LINE(rec.Rollno || ' ' || rec.Name || ' ' || rec.DOB || ' ' || rec.Phone || ' ' || rec.Address);
+    END LOOP;
+
+    -- Parameterized cursor
+    DBMS_OUTPUT.PUT_LINE('Parameterized Cursor:');
+    FOR rec IN (SELECT * FROM O_Roll) LOOP
+        FOR param_rec IN param_cur(rec.Rollno) LOOP
+            DBMS_OUTPUT.PUT_LINE(param_rec.Rollno || ' ' || param_rec.Name || ' ' || param_rec.DOB || ' ' || param_rec.Phone || ' ' || param_rec.Address);
+        END LOOP;
+    END LOOP;
+END;
+/
+ 
+
+ANS:
+
+CREATE TABLE Books (
+    AccNo INT PRIMARY KEY,
+    Title VARCHAR(255),
+    Author VARCHAR(255),
+    Publisher VARCHAR(255),
+    Count INT
+);
+
+CREATE TABLE Library_Audit (
+    AccNo INT,
+    Title VARCHAR(255),
+    Author VARCHAR(255),
+    Publisher VARCHAR(255),
+    Count INT,
+    AuditAction VARCHAR(10),
+    AuditTimestamp TIMESTAMP
+);
+
+CREATE OR REPLACE TRIGGER before_books_delete
+BEFORE DELETE ON Books
+FOR EACH ROW
+BEGIN
+    INSERT INTO Library_Audit (AccNo, Title, Author, Publisher, Count, AuditAction, AuditTimestamp)
+    VALUES (:OLD.AccNo, :OLD.Title, :OLD.Author, :OLD.Publisher, :OLD.Count, 'DELETE', SYSTIMESTAMP);
+END;
+/
+
+CREATE OR REPLACE TRIGGER after_books_update
+AFTER UPDATE ON Books
+FOR EACH ROW
+BEGIN
+    INSERT INTO Library_Audit (AccNo, Title, Author, Publisher, Count, AuditAction, AuditTimestamp)
+    VALUES (:OLD.AccNo, :OLD.Title, :OLD.Author, :OLD.Publisher, :OLD.Count, 'UPDATE', SYSTIMESTAMP);
+END;
+/
+
+ 
+
+-- Create procedure
+CREATE OR REPLACE PROCEDURE USER_QUERY_EMP(
+    p_myeno IN EMP.empno%TYPE,
+    p_myjob OUT EMP.job%TYPE,
+    p_mysal OUT EMP.sal%TYPE
+)
+IS
+BEGIN
+    SELECT job, sal INTO p_myjob, p_mysal
+    FROM EMP
+    WHERE empno = p_myeno;
+
+    EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('Employee with empno ' || p_myeno || ' does not exist.');
+END;
+/
+
+-- Invoke procedure for employee number 7839
+DECLARE
+    v_job EMP.job%TYPE;
+    v_sal EMP.sal%TYPE;
+BEGIN
+    USER_QUERY_EMP(7839, v_job, v_sal);
+    DBMS_OUTPUT.PUT_LINE('Employee 7839 - Job: ' || v_job || ', Salary: ' || v_sal);
+END;
+/
+
+-- Invoke procedure for employee number 7123
+DECLARE
+    v_job EMP.job%TYPE;
+    v_sal EMP.sal%TYPE;
+BEGIN
+    USER_QUERY_EMP(7123, v_job, v_sal);
+    DBMS_OUTPUT.PUT_LINE('Employee 7123 - Job: ' || v_job || ', Salary: ' || v_sal);
+END;
+/
+
+
+
+ 
+
+-- Create function
+CREATE OR REPLACE FUNCTION USER_ANNUAL_COMP(
+    p_eno IN EMP.empno%TYPE,
+    p_sal IN EMP.sal%TYPE DEFAULT 0,
+    p_comm IN EMP.comm%TYPE DEFAULT 0
+)
+RETURN NUMBER
+IS
+    v_annual_compensation NUMBER;
+BEGIN
+    IF p_sal IS NULL THEN
+        p_sal := 0;
+    END IF;
+    
+    IF p_comm IS NULL THEN
+        p_comm := 0;
+    END IF;
+
+    v_annual_compensation := (p_sal + p_comm) * 12;
+    RETURN v_annual_compensation;
+END;
+/
+
+-- Call function from SELECT statement
+SELECT empno, sal, comm, USER_ANNUAL_COMP(empno, sal, comm) AS annual_compensation
+FROM EMP;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+-- Create function
+CREATE OR REPLACE FUNCTION USER_VALID_DEPTNO(
+    p_dno IN DEPT.deptno%TYPE
+)
+RETURN BOOLEAN
+IS
+    v_count NUMBER;
+BEGIN
+    SELECT COUNT(*)
+    INTO v_count
+    FROM DEPT
+    WHERE deptno = p_dno;
+
+    IF v_count > 0 THEN
+        RETURN TRUE;
+    ELSE
+        RETURN FALSE;
+    END IF;
+END;
+/
+
+-- Example usage
+DECLARE
+    v_dno DEPT.deptno%TYPE := 20;
+BEGIN
+    IF USER_VALID_DEPTNO(v_dno) THEN
+        DBMS_OUTPUT.PUT_LINE('Department ' || v_dno || ' exists.');
+    ELSE
+        DBMS_OUTPUT.PUT_LINE('Department ' || v_dno || ' does not exist.');
+    END IF;
+END;
+/
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+CREATE TABLE salaryLog (
+    log_id INT PRIMARY KEY,
+    empno INT,
+    new_grade VARCHAR2(10),
+    old_salary NUMBER,
+    new_salary NUMBER,
+    log_date DATE DEFAULT SYSDATE
+);
+
+CREATE OR REPLACE TRIGGER TR_CHECK_GRADE
+AFTER UPDATE OF sal ON EMP
+FOR EACH ROW
+DECLARE
+    v_old_grade VARCHAR2(10);
+    v_new_grade VARCHAR2(10);
+BEGIN
+    SELECT grade
+    INTO v_old_grade
+    FROM SALGRADE
+    WHERE losal <= :OLD.sal AND hisal >= :OLD.sal;
+
+    SELECT grade
+    INTO v_new_grade
+    FROM SALGRADE
+    WHERE losal <= :NEW.sal AND hisal >= :NEW.sal;
+
+    IF v_old_grade != v_new_grade THEN
+        INSERT INTO salaryLog (log_id, empno, new_grade, old_salary, new_salary)
+        VALUES (salaryLog_seq.nextval, :OLD.empno, v_new_grade, :OLD.sal, :NEW.sal);
+    END IF;
+END;
+/
+
+
+UPDATE EMP
+SET sal = sal + 1000
+WHERE empno = 7839;

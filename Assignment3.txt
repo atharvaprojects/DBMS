@@ -1,0 +1,203 @@
+
+ 
+
+
+
+
+mysql> CREATE TABLE Members (    mem_id INT PRIMARY KEY,    mem_name VARCHAR(100),    memtype VARCHAR(50),    entitlement INT);
+ERROR 1046 (3D000): No database selected
+mysql> create database ass3;
+Query OK, 1 row affected (0.04 sec)
+
+mysql> use ass3;
+Database changed
+mysql> CREATE TABLE Members (    mem_id INT PRIMARY KEY,    mem_name VARCHAR(100),    memtype VARCHAR(50),    entitlement INT);
+Query OK, 0 rows affected (0.08 sec)
+
+mysql> CREATE TABLE Books (    bookid INT PRIMARY KEY,    bookname VARCHAR(100),    bookprice DECIMAL(10, 2));
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> CREATE TABLE BorrowedBooks (    mem_id INT,    bookid INT,    duration INT,    PRIMARY KEY (mem_id, bookid),    FOREIGN KEY (mem_id) REFERENCES Members(mem_id),    FOREIGN KEY (bookid) REFERENCES Books(bookid));
+Query OK, 0 rows affected (0.10 sec)
+
+mysql> INSERT INTO Members (mem_id, mem_name, memtype, entitlement)VALUES    (1, 'John Doe', 'student', 3),    (2, 'Jane Smith', 'staff', 5);
+Query OK, 2 rows affected (0.01 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO Books (bookid, bookname, bookprice)VALUES    (101, 'Data Science 101', 29.99),    (102, 'Advanced SQL', 34.99);
+Query OK, 2 rows affected (0.01 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO BorrowedBooks (mem_id, bookid, duration)VALUES    (1, 101, 14),    (2, 102, 21);
+Query OK, 2 rows affected (0.02 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+mysql> SELECT * FROM Members;
++--------+------------+---------+-------------+
+| mem_id | mem_name   | memtype | entitlement |
++--------+------------+---------+-------------+
+|      1 | John Doe   | student |           3 |
+|      2 | Jane Smith | staff   |           5 |
++--------+------------+---------+-------------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT * FROM BorrowedBooks;
++--------+--------+----------+
+| mem_id | bookid | duration |
++--------+--------+----------+
+|      1 |    101 |       14 |
+|      2 |    102 |       21 |
++--------+--------+----------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT * FROM Books;
++--------+------------------+-----------+
+| bookid | bookname         | bookprice |
++--------+------------------+-----------+
+|    101 | Data Science 101 |     29.99 |
+|    102 | Advanced SQL     |     34.99 |
++--------+------------------+-----------+
+2 rows in set (0.00 sec)
+mysql> SELECT * FROM BorrowedBooks WHERE mem_id = 1;SELECT * FROM Books;
++--------+--------+----------+
+| mem_id | bookid | duration |
++--------+--------+----------+
+|      1 |    101 |       14 |
++--------+--------+----------+
+1 row in set (0.00 sec)
+
++--------+------------------+-----------+
+| bookid | bookname         | bookprice |
++--------+------------------+-----------+
+|    101 | Data Science 101 |     29.99 |
+|    102 | Advanced SQL     |     34.99 |
++--------+------------------+-----------+
+2 rows in set (0.00 sec)
+mysql> SELECT * FROM BorrowedBooks; -- Checks if BorrowedBooks table exists and has dataSELECT * FROM Members;      -- Checks if Members table exists and has data
++--------+--------+----------+
+| mem_id | bookid | duration |
++--------+--------+----------+
+|      1 |    101 |       14 |
+|      2 |    102 |       21 |
++--------+--------+----------+
+2 rows in set (0.00 sec)
+mysql> SELECT * FROM Members;SELECT * FROM BorrowedBooks;
++--------+------------+---------+-------------+
+| mem_id | mem_name   | memtype | entitlement |
++--------+------------+---------+-------------+
+|      1 | John Doe   | student |           3 |
+|      2 | Jane Smith | staff   |           5 |
++--------+------------+---------+-------------+
+2 rows in set (0.00 sec)
+
++--------+--------+----------+
+| mem_id | bookid | duration |
++--------+--------+----------+
+|      1 |    101 |       14 |
+|      2 |    102 |       21 |
++--------+--------+----------+
+2 rows in set (0.00 sec)
+mysql> CREATE TABLE Faculty (    faculty_id INT PRIMARY KEY,    faculty_name VARCHAR(100));
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> CREATE TABLE Course (    course_id INT PRIMARY KEY,    course_name VARCHAR(100),    course_type VARCHAR(50),    course_duration INT);
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> CREATE TABLE FacultyCourses (    faculty_id INT,    course_id INT,    faculty_feedback INT,    PRIMARY KEY (faculty_id, course_id),    FOREIGN KEY (faculty_id) REFERENCES Faculty(faculty_id),    FOREIGN KEY (course_id) REFERENCES Course(course_id));
+Query OK, 0 rows affected (0.09 sec)
+
+mysql> INSERT INTO Faculty (faculty_id, faculty_name)VALUES    (1, 'Dr. Smith'),    (2, 'Prof. Johnson');
+Query OK, 2 rows affected (0.01 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO Course (course_id, course_name, course_type, course_duration)VALUES    (101, 'Mathematics 101', 'normal track', 8),    (102, 'Physics 101', 'fast track', 3);
+Query OK, 2 rows affected (0.01 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+mysql> INSERT INTO FacultyCourses (faculty_id, course_id, faculty_feedback)VALUES    (1, 101, 85),    (2, 102, 90);
+Query OK, 2 rows affected (0.01 sec)
+Records: 2  Duplicates: 0  Warnings: 0
+
+mysql> SELECT * FROM Faculty;
++------------+---------------+
+| faculty_id | faculty_name  |
++------------+---------------+
+|          1 | Dr. Smith     |
+|          2 | Prof. Johnson |
++------------+---------------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT * FROM Course;
++-----------+-----------------+--------------+-----------------+
+| course_id | course_name     | course_type  | course_duration |
++-----------+-----------------+--------------+-----------------+
+|       101 | Mathematics 101 | normal track |               8 |
+|       102 | Physics 101     | fast track   |               3 |
++-----------+-----------------+--------------+-----------------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT * FROM FacultyCourses;
++------------+-----------+------------------+
+| faculty_id | course_id | faculty_feedback |
++------------+-----------+------------------+
+|          1 |       101 |               85 |
+|          2 |       102 |               90 |
++------------+-----------+------------------+
+2 rows in set (0.00 sec)
+mysql> SELECT * FROM FacultyCourses;SELECT * FROM Course;SELECT * FROM FacultyCourses fc JOIN Course c ON fc.course_id = c.course_id
++------------+-----------+------------------+
+| faculty_id | course_id | faculty_feedback |
++------------+-----------+------------------+
+|          1 |       101 |               85 |
+|          2 |       102 |               90 |
++------------+-----------+------------------+
+2 rows in set (0.00 sec)
+
++-----------+-----------------+--------------+-----------------+
+| course_id | course_name     | course_type  | course_duration |
++-----------+-----------------+--------------+-----------------+
+|       101 | Mathematics 101 | normal track |               8 |
+|       102 | Physics 101     | fast track   |               3 |
++-----------+-----------------+--------------+-----------------+
+2 rows in set (0.00 sec)
++------------+-----------+------------------+-----------+-----------------+--------------+-----------------+
+| faculty_id | course_id | faculty_feedback | course_id | course_name     | course_type  | course_duration |
++------------+-----------+------------------+-----------+-----------------+--------------+-----------------+
+|          1 |       101 |               85 |       101 | Mathematics 101 | normal track |               8 |
+|          2 |       102 |               90 |       102 | Physics 101     | fast track   |               3 |
++------------+-----------+------------------+-----------+-----------------+--------------+-----------------+
+2 rows in set (0.00 sec)
+mysql> SELECT * FROM FacultyCourses;SELECT * FROM Course;SELECT * FROM FacultyCourses fc JOIN Course c ON fc.course_id = c.course_id
++------------+-----------+------------------+
+| faculty_id | course_id | faculty_feedback |
++------------+-----------+------------------+
+|          1 |       101 |               85 |
+|          2 |       102 |               90 |
++------------+-----------+------------------+
+2 rows in set (0.00 sec)
+
++-----------+-----------------+--------------+-----------------+
+| course_id | course_name     | course_type  | course_duration |
++-----------+-----------------+--------------+-----------------+
+|       101 | Mathematics 101 | normal track |               8 |
+|       102 | Physics 101     | fast track   |               3 |
++-----------+-----------------+--------------+-----------------+
+2 rows in set (0.00 sec)
+mysql> CREATE TABLE DepartmentStaff (    Dept_id VARCHAR(10),    Staff_id INT,    PRIMARY KEY (Dept_id, Staff_id));
+Query OK, 0 rows affected (0.04 sec)
+mysql> INSERT INTO DepartmentStaff (Dept_id, Staff_id)VALUES ('D1', 123);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> INSERT INTO DepartmentStaff (Dept_id, Staff_id)VALUES ('D1', 124),('D2', 125),('D1', 126);
+Query OK, 3 rows affected (0.01 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+mysql> select * from DepartmentStaff;
++---------+----------+
+| Dept_id | Staff_id |
++---------+----------+
+| D1      |      123 |
+| D1      |      124 |
+| D1      |      126 |
+| D2      |      125 |
++---------+----------+
+4 rows in set (0.00 sec)

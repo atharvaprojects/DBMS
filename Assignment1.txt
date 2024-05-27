@@ -1,0 +1,310 @@
+
+
+mysql> create table Matches(MatchID int,
+    ->                                 Team1 varchar(100),
+    ->                              Team2 varchar(100),
+    ->                                  Location varchar(100),
+    ->                                 Winner varchar(50),
+    ->                                  Umpire varchar(100));
+Query OK, 0 rows affected (0.11 sec)
+
+mysql> show tables;
++-------------------+
+| Tables_in_cricket |
++-------------------+
+| matches           |
+| student           |
++-------------------+
+2 rows in set (0.01 sec)
+
+mysql> create table Matches(MatchID int,Team1 varchar(255),Team2 varchar(255),Location varchar(200),Winner varchar(100),Umpire varchar(100));
+ERROR 1050 (42S01): Table 'matches' already exists
+mysql> INSERT INTO Matches (MatchID, Team1, Team2, Location, Winner, Umpire)
+    ->      VALUES
+    ->       (1, 'India', 'Australia', 'Sydney', 'India', 'John Doe'),
+    ->       (2, 'England', 'New Zealand', 'London', 'New Zealand', 'Jane Smith'),
+    ->       (3, 'South Africa', 'Pakistan', 'Cape Town', 'South Africa', 'Bob Johnson'),
+    ->       (4, 'India' , 'Sri Lanka', 'Mumbai', 'India', 'Paul Wilson'),
+    ->       (5, 'England', 'Netherlands', 'Pune', 'England', 'Rod Tucker'),
+    ->       (6, 'India', 'South Africa' , 'Kolkata' , 'India', 'John Doe'),
+    ->       (7, 'India', 'New Zealand', 'Mumbai', 'India', 'Jane Smith'),
+    ->       (8, 'New Zealand', 'Pakistan', 'Bengaluru', 'Pakistan', 'Nitin Menon'),
+    ->       (9, 'Bangladesh', 'Afghanistan', 'Dharamshala', 'Bangladesh', 'Rod Tucker'),
+    ->       (10,'India', 'Pakistan', 'Ahmedabad', 'India', 'Bob Johnson');
+Query OK, 10 rows affected (0.01 sec)
+Records: 10  Duplicates: 0  Warnings: 0
+
+mysql> select * from matches;
++---------+--------------+--------------+-------------+--------------+-------------+
+| MatchID | Team1        | Team2        | Location    | Winner       | Umpire      |
++---------+--------------+--------------+-------------+--------------+-------------+
+|       1 | India        | Australia    | Sydney      | India        | John Doe    |
+|       2 | England      | New Zealand  | London      | New Zealand  | Jane Smith  |
+|       3 | South Africa | Pakistan     | Cape Town   | South Africa | Bob Johnson |
+|       4 | India        | Sri Lanka    | Mumbai      | India        | Paul Wilson |
+|       5 | England      | Netherlands  | Pune        | England      | Rod Tucker  |
+|       6 | India        | South Africa | Kolkata     | India        | John Doe    |
+|       7 | India        | New Zealand  | Mumbai      | India        | Jane Smith  |
+|       8 | New Zealand  | Pakistan     | Bengaluru   | Pakistan     | Nitin Menon |
+|       9 | Bangladesh   | Afghanistan  | Dharamshala | Bangladesh   | Rod Tucker  |
+|      10 | India        | Pakistan     | Ahmedabad   | India        | Bob Johnson |
++---------+--------------+--------------+-------------+--------------+-------------+
+10 rows in set (0.00 sec)
+
+mysql> select * from matches where Winner = 'India';
++---------+-------+--------------+-----------+--------+-------------+
+| MatchID | Team1 | Team2        | Location  | Winner | Umpire      |
++---------+-------+--------------+-----------+--------+-------------+
+|       1 | India | Australia    | Sydney    | India  | John Doe    |
+|       4 | India | Sri Lanka    | Mumbai    | India  | Paul Wilson |
+|       6 | India | South Africa | Kolkata   | India  | John Doe    |
+|       7 | India | New Zealand  | Mumbai    | India  | Jane Smith  |
+|      10 | India | Pakistan     | Ahmedabad | India  | Bob Johnson |
++---------+-------+--------------+-----------+--------+-------------+
+5 rows in set (0.00 sec)
+
+mysql> INSERT INTO Players (PlayerID, PlayerName, Country, MatchedPlayed)
+    -> VALUES
+    ->     (1, 'Virat Kohli', 'India', 100),
+    ->     (2, 'Steve Smith', 'Australia', 95),
+    ->     (3, 'Joe Root', 'England', 110),
+    ->     (4, 'Kane Williamson', 'New Zealand', 105),
+    ->     (5, 'Babar Azam', 'Pakistan', 90),
+    ->     (6, 'Faf du Plessis', 'South Africa', 85),
+    ->     (7, 'Ross Taylor', 'New Zealand', 92);
+ERROR 1146 (42S02): Table 'cricket.players' doesn't exist
+mysql> create table Players(PlayerID int,
+    ->                                 PlayerName varchar(100),
+    ->                              Country varchar(100),
+    ->                                 MatchedPlayed int(100));
+Query OK, 0 rows affected, 1 warning (0.07 sec)
+
+mysql>
+mysql> INSERT INTO Players (PlayerID, PlayerName, Country, MatchedPlayed)
+    -> VALUES
+    ->     (1, 'Virat Kohli', 'India', 100),
+    ->     (2, 'Steve Smith', 'Australia', 95),
+    ->     (3, 'Joe Root', 'England', 110),
+    ->     (4, 'Kane Williamson', 'New Zealand', 105),
+    ->     (5, 'Babar Azam', 'Pakistan', 90),
+    ->     (6, 'Faf du Plessis', 'South Africa', 85),
+    ->     (7, 'Ross Taylor', 'New Zealand', 92);
+Query OK, 7 rows affected (0.03 sec)
+Records: 7  Duplicates: 0  Warnings: 0
+
+mysql> select * from Players;
++----------+-----------------+--------------+---------------+
+| PlayerID | PlayerName      | Country      | MatchedPlayed |
++----------+-----------------+--------------+---------------+
+|        1 | Virat Kohli     | India        |           100 |
+|        2 | Steve Smith     | Australia    |            95 |
+|        3 | Joe Root        | England      |           110 |
+|        4 | Kane Williamson | New Zealand  |           105 |
+|        5 | Babar Azam      | Pakistan     |            90 |
+|        6 | Faf du Plessis  | South Africa |            85 |
+|        7 | Ross Taylor     | New Zealand  |            92 |
++----------+-----------------+--------------+---------------+
+7 rows in set (0.00 sec)
+
+mysql> select * from Players where MatchedPlayed = 0;
+Empty set (0.00 sec)
+
+mysql> create table BattingStats(
+    ->        PlayeredId int primary key,
+    ->        RunsScored int);
+Query OK, 0 rows affected (0.07 sec)
+
+mysql> show tables;
++-------------------+
+| Tables_in_cricket |
++-------------------+
+| battingstats      |
+| matches           |
+| players           |
+| student           |
++-------------------+
+4 rows in set (0.00 sec)
+
+mysql>  insert into BattingStats values(1,500),(2,450),(3,600),(4,200),(5,150),(6,800),(7,500);
+Query OK, 7 rows affected (0.01 sec)
+Records: 7  Duplicates: 0  Warnings: 0
+
+mysql>  select * from BattingStats;
++------------+------------+
+| PlayeredId | RunsScored |
++------------+------------+
+|          1 |        500 |
+|          2 |        450 |
+|          3 |        600 |
+|          4 |        200 |
+|          5 |        150 |
+|          6 |        800 |
+|          7 |        500 |
++------------+------------+
+7 rows in set (0.00 sec)
+
+mysql> SELECT p.PlayerName AS MaxRunsBatsman
+    ->          FROM Players p
+    ->          JOIN BattingStats b ON p.PlayerID = b.PlayeredID
+    ->          ORDER BY b.RunsScored DESC
+    ->          LIMIT 1;
++----------------+
+| MaxRunsBatsman |
++----------------+
+| Faf du Plessis |
++----------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT p.PlayerName AS MinRunsBatsman
+    ->         FROM Players p
+    ->         JOIN BattingStats b ON p.PlayerID = b.PlayeredID
+    ->         ORDER BY b.RunsScored ASC
+    ->          LIMIT 1;
++----------------+
+| MinRunsBatsman |
++----------------+
+| Babar Azam     |
++----------------+
+1 row in set (0.00 sec)
+
+mysql> select playerName,Matchedplayed from players where Country = "India";
++-------------+---------------+
+| playerName  | Matchedplayed |
++-------------+---------------+
+| Virat Kohli |           100 |
++-------------+---------------+
+1 row in set (0.00 sec)
+
+mysql> select distinct Team1 as Country from matches where location = "Mumbai" Union select distinct Team2 as Country from matches where location = "Mumbai";
++-------------+
+| Country     |
++-------------+
+| India       |
+| Sri Lanka   |
+| New Zealand |
++-------------+
+3 rows in set (0.00 sec)
+
+mysql>  select Team1 as TeamName,Location from matches Union select Team2 as TeamName,Location from matches;
++--------------+-------------+
+| TeamName     | Location    |
++--------------+-------------+
+| India        | Sydney      |
+| England      | London      |
+| South Africa | Cape Town   |
+| India        | Mumbai      |
+| England      | Pune        |
+| India        | Kolkata     |
+| New Zealand  | Bengaluru   |
+| Bangladesh   | Dharamshala |
+| India        | Ahmedabad   |
+| Australia    | Sydney      |
+| New Zealand  | London      |
+| Pakistan     | Cape Town   |
+| Sri Lanka    | Mumbai      |
+| Netherlands  | Pune        |
+| South Africa | Kolkata     |
+| New Zealand  | Mumbai      |
+| Pakistan     | Bengaluru   |
+| Afghanistan  | Dharamshala |
+| Pakistan     | Ahmedabad   |
++--------------+-------------+
+19 rows in set (0.00 sec)
+
+mysql> create table Team(
+    ->         Team_id int primary key,
+    ->         TeamName varchar(255));
+Query OK, 0 rows affected (0.07 sec)
+
+mysql> insert into Team values(1,'Australia'),(2,'India'),(3,'England'),(4,'South Africa'),(5,'Pakistan');
+Query OK, 5 rows affected (0.02 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> select * from Team;
++---------+--------------+
+| Team_id | TeamName     |
++---------+--------------+
+|       1 | Australia    |
+|       2 | India        |
+|       3 | England      |
+|       4 | South Africa |
+|       5 | Pakistan     |
++---------+--------------+
+5 rows in set (0.00 sec)
+
+mysql>  insert into Team values(6,"Chennai"),(7,"Delhi"),(8,"Mumbai");
+Query OK, 3 rows affected (0.01 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> select* from Team;
++---------+--------------+
+| Team_id | TeamName     |
++---------+--------------+
+|       1 | Australia    |
+|       2 | India        |
+|       3 | England      |
+|       4 | South Africa |
+|       5 | Pakistan     |
+|       6 | Chennai      |
+|       7 | Delhi        |
+|       8 | Mumbai       |
++---------+--------------+
+8 rows in set (0.00 sec)
+
+mysql> select TeamName from Team where TeamName NOT IN (select Team1 from matches UNION select Team2 from matches);
++----------+
+| TeamName |
++----------+
+| Chennai  |
+| Delhi    |
+| Mumbai   |
++----------+
+3 rows in set (0.00 sec)
+
+mysql> select Country,SUM(MatchedPlayed) as TotalMatchesPlayed from players group by Country;
++--------------+--------------------+
+| Country      | TotalMatchesPlayed |
++--------------+--------------------+
+| India        |                100 |
+| Australia    |                 95 |
+| England      |                110 |
+| New Zealand  |                197 |
+| Pakistan     |                 90 |
+| South Africa |                 85 |
++--------------+--------------------+
+6 rows in set (0.00 sec)
+
+mysql> SELECT
+    ->     TeamName,
+    ->     OpponentTeam,
+    ->     COUNT(*) AS MatchesWon
+    -> FROM
+    ->     (
+    ->         SELECT
+    ->             Team1 AS TeamName,
+    ->             Team2 AS OpponentTeam,
+    ->             CASE
+    ->                 WHEN Winner = Team1 THEN Team1
+    ->                 ELSE Team2
+    ->             END AS WinnerTeam
+    ->         FROM
+    ->             Matches
+    ->     ) AS MatchResults
+    -> GROUP BY
+    ->     TeamName,
+    ->     OpponentTeam;
++--------------+--------------+------------+
+| TeamName     | OpponentTeam | MatchesWon |
++--------------+--------------+------------+
+| India        | Australia    |          1 |
+| England      | New Zealand  |          1 |
+| South Africa | Pakistan     |          1 |
+| India        | Sri Lanka    |          1 |
+| England      | Netherlands  |          1 |
+| India        | South Africa |          1 |
+| India        | New Zealand  |          1 |
+| New Zealand  | Pakistan     |          1 |
+| Bangladesh   | Afghanistan  |          1 |
+| India        | Pakistan     |          1 |
++--------------+--------------+------------+
+10 rows in set (0.00 sec)

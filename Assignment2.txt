@@ -1,0 +1,288 @@
+
+mysql> insert into instructor values(113,"Prof. Sandhya","Latur","Civil"),(114,"Prof. Kavya","Nashik","Robotics"),(115,"
+Prof. Reva","Mumbai","Artifitial Intelligence");
+Query OK, 3 rows affected (0.01 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> select * from instructor;
++---------------+-----------------+-----------------+-------------------------+
+| instructor_id | instructor_name | instructor_city | specialization          |
++---------------+-----------------+-----------------+-------------------------+
+|           111 | Prof. Prajakta  | Pune            | Computer                |
+|           112 | Prof. Manjiri   | Pune            | Computer                |
+|           113 | Prof. Sandhya   | Latur           | Civil                   |
+|           114 | Prof. Kavya     | Nashik          | Robotics                |
+|           115 | Prof. Reva      | Mumbai          | Artifitial Intelligence |
++---------------+-----------------+-----------------+-------------------------+
+5 rows in set (0.00 sec)
+
+mysql> select * from Student;
++------------+--------------+---------------+--------------+
+| student_id | student_name | instructor_id | student_city |
++------------+--------------+---------------+--------------+
+|          1 | Sanika       |           111 | Pune         |
+|          2 | Akshata      |           112 | Nanded       |
+|          4 | Purva        |           113 | Jintur       |
+|          3 | Siddhi       |           114 | Pune         |
+|          5 | Sarika       |           115 | Mumbai       |
++------------+--------------+---------------+--------------+
+5 rows in set (0.00 sec)
+
+1.Add primary and foreign keys.
+
+mysql> desc student;
++---------------+--------------+------+-----+---------+-------+
+| Field         | Type         | Null | Key | Default | Extra |
++---------------+--------------+------+-----+---------+-------+
+| student_id    | int(11)      | YES  |     | NULL    |       |
+| student_name  | varchar(200) | YES  |     | NULL    |       |
+| instructor_id | int(11)      | NO   | PRI |         |       |
+| student_city  | varchar(100) | YES  |     | NULL    |       |
++---------------+--------------+------+-----+---------+-------+
+
+ alter table instructor
+ -> add foreign key(instructor_id) REFERENCES student(instructor_id);
+Query OK, 5 rows affected (0.03 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> desc instructor;
++-----------------+--------------+------+-----+---------+-------+
+| Field           | Type         | Null | Key | Default | Extra |
++-----------------+--------------+------+-----+---------+-------+
+| instructor_id   | int(11)      | YES  | MUL | NULL    |       |
+| instructor_name | varchar(200) | YES  |     | NULL    |       |
+| instructor_city | varchar(100) | YES  |     | NULL    |       |
+| specialization  | varchar(300) | YES  |     | NULL    |       |
++-----------------+--------------+------+-----+---------+-------+
+
+2. Find the instructor of each student.
+
+mysql> select student.Student_name,instructor.instructor_name from student join instructor ON student.instructor_id = instructor.instructor_id;
++--------------+-----------------+
+| Student_name | instructor_name |
++--------------+-----------------+
+| Sanika       | Prof. Prajakta  |
+| Akshata      | Prof. Manjiri   |
+| Purva        | Prof. Sandhya   |
+| Siddhi       | Prof. Kavya     |
+| Sarika       | Prof. Reva      |
++--------------+-----------------+
+
+3.find student who is not having any instructor.
+
+mysql> select Student_name from student join instructor ON student.instructor_id = instructor.instructor_id where instructor.instructor_id = 0;
+Empty set (0.00 sec) 
+
+4. Find the students whose instructor’s specialization is computer.
+
+mysql> select student.Student_name from student join instructor ON student.instructor_id = instructor.instructor_id wher
+e instructor.specialization = 'computer';
++--------------+
+| Student_name |
++--------------+
+| Sanika       |
+| Akshata      |
++--------------+
+2 rows in set (0.00 sec)
+
+5.Create a view containing total number of students whose instructor belongs to "Pune".
+
+mysql> CREATE VIEW Students_In_Pune_Count AS
+    -> SELECT COUNT(s.student_id) AS total_students_in_pune
+    -> FROM Student s
+    -> JOIN Instructor i ON s.instructor_id = i.instructor_id
+    -> WHERE s.student_city = 'Pune';
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> SELECT * FROM Students_In_Pune_Count;
++------------------------+
+| total_students_in_pune |
++------------------------+
+
+|                      2 |
++------------------------+
+1 row in set (0.02 sec)
+
+6.Find the student who is not having any instructor as well as instructor who is not having student.
+SELECT
+    ->     student_id,
+    ->     student_name
+    -> FROM
+    ->     Student
+    -> WHERE
+    ->     instructor_id NOT IN (SELECT instructor_id FROM instructor)
+    ->
+    -> UNION
+    ->
+    -> SELECT
+    ->     instructor_id,
+    ->     instructor_name
+    -> FROM
+    ->     instructor
+    -> WHERE
+    ->     instructor_id NOT IN (SELECT instructor_id FROM Student);
+Empty set (0.00 sec)
+
+
+mysql> create table departments(
+    -> department_id int(11) AUTO_INCREMENT PRIMARY KEY,
+    -> department_name varchar(30) NOT NULL,
+    -> location_id int(11) DEFAULT NULL
+    -> );
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> create table employees(
+    -> employee_id int(11) AUTO_INCREMENT PRIMARY KEY,
+    -> first_name varchar(20) DEFAULT NULL,
+    -> last_name varchar(25) NOT NULL,
+    -> email varchar(100) NOT NULL,
+    -> phone_no varchar(20) DEFAULT NULL,
+    -> hire_date Date NOT NULL,
+    -> job_id int(11) NOT NULL,
+    -> salary decimal(8,2) NOT NULL,
+    -> manager_id int(11) DEFAULT NULL,
+    -> department_id int(11) DEFAULT NULL,
+    -> foreign key(department_id) REFERENCES departments(department_id) ON delete cascade ON update cascade,foreign key(manager_id) REFERENCES employees(emp
+loyee_id)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+1.find all employees who locate in the location with id 1700.
+
+mysql> SELECT DISTINCT e.*
+    -> FROM employees e
+    -> JOIN employees e2 ON e.location_id = e2.location_id
+    -> WHERE e.location_id = 1700;
++-------------+------------+-----------+-----------------+------------+------------+--------+----------+------------+---------------+-------------+
+| employee_id | first_name | last_name | email           | phone_no   | hire_date  | job_id | salary   | manager_id | department_id | location_id |
++-------------+------------+-----------+-----------------+------------+------------+--------+----------+------------+---------------+-------------+
+|        1500 | Priya      | Sharma    | priya@gmail.com | 8765456789 | 1989-03-23 |   4646 | 60000.00 |       NULL |          NULL |        1700 |
+|        1800 | Kavya      | Desai     | kavya@gmail.com | 8967546879 | 1999-10-28 |   3638 | 40000.00 |       NULL |          NULL |        1700 |
++-------------+------------+-----------+-----------------+------------+------------+--------+----------+------------+---------------+-------------+
+2 rows in set (0.00 sec)
+
+
+
+2.find all employees who do not locate at the location 1700.
+mysql> SELECT e.*
+    -> FROM employees e
+    -> LEFT JOIN employees e2 ON e.location_id = e2.location_id AND e2.location_id = 1700
+    -> WHERE e2.location_id IS NULL;
++-------------+------------+-----------+----------------+------------+------------+--------+----------+------------+---------------+-------------+
+| employee_id | first_name | last_name | email          | phone_no   | hire_date  | job_id | salary   | manager_id | department_id | location_id |
++-------------+------------+-----------+----------------+------------+------------+--------+----------+------------+---------------+-------------+
+|        1600 | Riya       | Patil     | riya@gmail.com | 7867675768 | 1999-08-19 |   5746 | 50000.00 |       NULL |          NULL |        6778 |
+|        1700 | Raj        | Joshi     | raj@gmail.com  | 989798072  | 1996-01-28 |   4488 | 30000.00 |       NULL |          NULL |        5367 |
+|        1900 | Siya       | Patil     | siya@gmail.com | 897697578  | 1998-04-12 |   4784 | 55000.00 |       NULL |          NULL |       76768 |
++-------------+------------+-----------+----------------+------------+------------+--------+----------+------------+---------------+-------------+
+3 rows in set (0.01 sec)
+
+3. Finds the employees who have the highest salary.
+
+mysql> SELECT *
+    -> FROM employees
+    -> WHERE salary = (SELECT MAX(salary) FROM employees);
++-------------+------------+-----------+-----------------+------------+------------+--------+----------+------------+---------------+-------------+
+| employee_id | first_name | last_name | email           | phone_no   | hire_date  | job_id | salary   | manager_id | department_id | location_id |
++-------------+------------+-----------+-----------------+------------+------------+--------+----------+------------+---------------+-------------+
+|        1500 | Priya      | Sharma    | priya@gmail.com | 8765456789 | 1989-03-23 |   4646 | 60000.00 |       NULL |          NULL |        1700 |
++-------------+------------+-----------+-----------------+------------+------------+--------+----------+------------+---------------+-------------+
+1 row in set (0.00 sec)
+
+4. Finds all employees who salaries are greater than the average salary of all employees.
+
+ SELECT
+    ->employee_id,
+    ->first_name,
+    ->last_name,
+    ->salary
+    -> FROM
+    ->     employees
+    -> WHERE
+    ->     salary > (
+    ->         SELECT AVG(salary)
+    ->         FROM employees
+    ->     );
++-------------+------------+-----------+----------+
+| employee_id | first_name | last_name | salary   |
++-------------+------------+-----------+----------+
+|        1500 | Priya      | Sharma    | 60000.00 |
+|        1600 | Riya       | Patil     | 50000.00 |
+|        1900 | Siya       | Patil     | 55000.00 |
++-------------+------------+-----------+----------+
+3 rows in set (0.00 sec)
+
+5.Finds all departments which have at least one employee with the salary is greater than 10,000
+SELECT DISTINCT
+    ->d.department_id,
+    ->d.department_name
+    -> FROM
+    ->     departments d
+    -> INNER JOIN
+    ->     employees e ON d.department_id = e.department_id
+    -> WHERE
+    ->     e.salary > 10000;
++---------------+-----------------+
+| department_id | department_name |
++---------------+-----------------+
+|          2002 | Sales           |
+|          2387 | Marketing       |
+|          2778 | Administration  |
+|          3636 | IT              |
+|          4782 | Production      |
++---------------+-----------------+
+5 rows in set (0.00 sec)
+
+6.Finds all departments that do not have any employee with the salary greater than 10,000
+SELECT
+    ->d.department_id,
+    ->d.department_name
+    -> FROM
+    ->     departments d
+    -> LEFT JOIN
+    ->     employees e ON d.department_id = e.department_id AND e.salary > 10000
+    -> WHERE
+    ->     e.employee_id IS NULL;
+Empty set (0.00 sec)
+
+7. Finds all employees whose salaries are greater than the lowest salary of every department
+ SELECT
+    ->employee_id,
+    ->first_name,
+    ->last_name,
+    ->salary
+    -> FROM
+    ->     employees e
+    -> WHERE
+    ->     salary > (SELECT MIN(salary) FROM employees WHERE department_id = e.department_id);
+Empty set (0.00 sec)
+
+8. Finds all employees whose salaries are greater than or equal to the highest salary of every department
+ SELECT
+    ->     e.employee_id,
+    ->     e.first_name,
+    ->     e.last_name,
+    ->     e.salary
+    -> FROM
+    ->     employees e
+    -> JOIN (
+    ->     SELECT
+    ->         department_id,
+    ->         MAX(salary) AS max_salary
+    ->     FROM
+    ->         employees
+    ->     GROUP BY
+    ->         department_id
+    -> ) AS max_salaries ON e.department_id = max_salaries.department_id
+    -> WHERE
+    ->     e.salary >= max_salaries.max_salary;
++-------------+------------+-----------+----------+
+| employee_id | first_name | last_name | salary   |
++-------------+------------+-----------+----------+
+|        1500 | Priya      | Sharma    | 60000.00 |
+|        1600 | Riya       | Patil     | 50000.00 |
+|        1700 | Raj        | Joshi     | 30000.00 |
+|        1800 | Kavya      | Desai     | 40000.00 |
+|        1900 | Siya       | Patil     | 55000.00 |
++-------------+------------+-----------+----------+
+5 rows in set (0.00 sec)
