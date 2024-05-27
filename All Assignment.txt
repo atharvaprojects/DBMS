@@ -1,0 +1,203 @@
+Sure! Let's go over the fundamental concepts of SQL and PL/SQL. This comprehensive overview will cover a range of topics from basic SQL operations to advanced PL/SQL concepts.
+
+### **SQL Concepts**
+
+#### **1. Basics of SQL**
+- **SQL (Structured Query Language):** A standard language for managing and manipulating databases.
+- **Types of SQL Commands:**
+  - **DDL (Data Definition Language):** Commands that define the structure of the database.
+  - **DML (Data Manipulation Language):** Commands that manipulate the data within the database.
+  - **DCL (Data Control Language):** Commands that control access to the data within the database.
+  - **TCL (Transaction Control Language):** Commands that manage transactions within the database.
+
+#### **2. DDL Commands**
+- **CREATE:** Used to create a new table, database, index, or view.
+  ```sql
+  CREATE TABLE employees (
+      employee_id INT PRIMARY KEY,
+      name VARCHAR(50),
+      department VARCHAR(50)
+  );
+  ```
+- **ALTER:** Used to modify an existing database object.
+  ```sql
+  ALTER TABLE employees ADD salary DECIMAL(10, 2);
+  ```
+- **DROP:** Used to delete an existing database object.
+  ```sql
+  DROP TABLE employees;
+  ```
+- **TRUNCATE:** Used to remove all records from a table without logging individual row deletions.
+  ```sql
+  TRUNCATE TABLE employees;
+  ```
+
+#### **3. DML Commands**
+- **INSERT:** Adds new records to a table.
+  ```sql
+  INSERT INTO employees (employee_id, name, department) VALUES (1, 'John Doe', 'HR');
+  ```
+- **UPDATE:** Modifies existing records in a table.
+  ```sql
+  UPDATE employees SET salary = 50000 WHERE employee_id = 1;
+  ```
+- **DELETE:** Removes existing records from a table.
+  ```sql
+  DELETE FROM employees WHERE employee_id = 1;
+  ```
+
+#### **4. DCL Commands**
+- **GRANT:** Gives a user access privileges to the database.
+  ```sql
+  GRANT SELECT, INSERT ON employees TO user1;
+  ```
+- **REVOKE:** Removes access privileges from a user.
+  ```sql
+  REVOKE INSERT ON employees FROM user1;
+  ```
+
+#### **5. Constraints**
+- **Primary Key:** Uniquely identifies each record in a table.
+  ```sql
+  PRIMARY KEY (employee_id)
+  ```
+- **Foreign Key:** Ensures referential integrity by linking two tables.
+  ```sql
+  FOREIGN KEY (department_id) REFERENCES departments(department_id)
+  ```
+- **Unique:** Ensures all values in a column are unique.
+  ```sql
+  UNIQUE (email)
+  ```
+- **Not Null:** Ensures a column cannot have NULL values.
+  ```sql
+  name VARCHAR(50) NOT NULL
+  ```
+- **Check:** Ensures values in a column meet a specific condition.
+  ```sql
+  CHECK (salary > 0)
+  ```
+- **IN Operator:** Used to filter records based on a list of values.
+  ```sql
+  SELECT * FROM employees WHERE department IN ('HR', 'Finance');
+  ```
+
+#### **6. Aggregate Functions**
+- **COUNT, SUM, AVG, MAX, MIN:**
+  ```sql
+  SELECT COUNT(*), SUM(salary), AVG(salary), MAX(salary), MIN(salary) FROM employees;
+  ```
+
+#### **7. Built-in Functions**
+- **Numeric Functions:** e.g., `ABS()`, `POWER()`
+  ```sql
+  SELECT ABS(-10), POWER(2, 3);
+  ```
+- **Date Functions:** e.g., `NOW()`, `DATEADD()`
+  ```sql
+  SELECT NOW(), DATEADD(year, 1, '2023-01-01');
+  ```
+- **String Functions:** e.g., `CONCAT()`, `SUBSTRING()`
+  ```sql
+  SELECT CONCAT('Hello', 'World'), SUBSTRING('HelloWorld', 1, 5);
+  ```
+
+#### **8. Set Operations**
+- **UNION, INTERSECT, EXCEPT:**
+  ```sql
+  SELECT name FROM employees UNION SELECT name FROM managers;
+  ```
+
+#### **9. Sub-queries and Correlated Sub-queries**
+- **Sub-query:**
+  ```sql
+  SELECT name FROM employees WHERE salary > (SELECT AVG(salary) FROM employees);
+  ```
+- **Correlated Sub-query:**
+  ```sql
+  SELECT e1.name FROM employees e1 WHERE salary > (SELECT AVG(salary) FROM employees e2 WHERE e1.department_id = e2.department_id);
+  ```
+
+#### **10. Joins**
+- **INNER JOIN, LEFT JOIN, RIGHT JOIN, FULL JOIN:**
+  ```sql
+  SELECT employees.name, departments.name FROM employees INNER JOIN departments ON employees.department_id = departments.department_id;
+  ```
+
+#### **11. EXISTS, ANY, ALL**
+- **EXISTS:**
+  ```sql
+  SELECT name FROM employees WHERE EXISTS (SELECT * FROM departments WHERE employees.department_id = departments.department_id);
+  ```
+- **ANY:**
+  ```sql
+  SELECT name FROM employees WHERE salary > ANY (SELECT salary FROM employees WHERE department = 'HR');
+  ```
+- **ALL:**
+  ```sql
+  SELECT name FROM employees WHERE salary > ALL (SELECT salary FROM employees WHERE department = 'HR');
+  ```
+
+#### **12. Views**
+- **View and its types:**
+  ```sql
+  CREATE VIEW high_salary_employees AS SELECT name, salary FROM employees WHERE salary > 100000;
+  ```
+
+#### **13. Transaction Control Commands**
+- **COMMIT, ROLLBACK, SAVEPOINT:**
+  ```sql
+  BEGIN TRANSACTION;
+  INSERT INTO employees (employee_id, name, department) VALUES (2, 'Jane Doe', 'Finance');
+  SAVEPOINT savepoint1;
+  UPDATE employees SET salary = 60000 WHERE employee_id = 2;
+  ROLLBACK TO savepoint1;
+  COMMIT;
+  ```
+
+### **PL/SQL Concepts**
+
+#### **1. Cursors**
+- **Implicit Cursor: Automatically created by Oracle for single SQL statements.**
+- **Explicit Cursor: Defined by the programmer for queries returning multiple rows.**
+  ```sql
+  DECLARE
+    CURSOR emp_cursor IS SELECT employee_id, name FROM employees;
+  BEGIN
+    FOR emp_record IN emp_cursor LOOP
+      DBMS_OUTPUT.PUT_LINE(emp_record.name);
+    END LOOP;
+  END;
+  ```
+
+#### **2. Stored Procedures**
+- **A stored procedure is a precompiled set of one or more SQL statements that perform some specific task.**
+  ```sql
+  CREATE PROCEDURE raise_salary (emp_id INT, increment DECIMAL) AS
+  BEGIN
+    UPDATE employees SET salary = salary + increment WHERE employee_id = emp_id;
+  END;
+  ```
+
+#### **3. Stored Function**
+- **A stored function is similar to a procedure but returns a single value.**
+  ```sql
+  CREATE FUNCTION get_salary (emp_id INT) RETURN DECIMAL IS
+    emp_salary DECIMAL(10, 2);
+  BEGIN
+    SELECT salary INTO emp_salary FROM employees WHERE employee_id = emp_id;
+    RETURN emp_salary;
+  END;
+  ```
+
+#### **4. Database Triggers**
+- **A trigger is a stored program that is executed automatically in response to certain events on a particular table or view.**
+  ```sql
+  CREATE TRIGGER trg_after_insert AFTER INSERT ON employees
+  FOR EACH ROW
+  BEGIN
+    INSERT INTO audit_log (log_message) VALUES ('New employee added: ' || :new.name);
+  END;
+  ```
+
+This overview covers the key concepts and commands in SQL and PL/SQL, providing a solid foundation for understanding database management and manipulation.
